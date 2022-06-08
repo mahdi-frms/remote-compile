@@ -16,10 +16,22 @@ async function login(req, res) {
     let { username, password } = req.body;
     let user = await User.get(username);
     if (!user) return res.status(400).end('invalid username or password');
-    password = crypto.createHash('md5').update(password);
+    password = crypto.createHash('md5').update(password).digest('hex');
     if (user.password != password) return res.status(400).end('invalid username or password');
     const token = createToken(username);
     res.cookie('jwt-token', token).end();
 }
 
-exports.login = express().use(login);
+async function register(req, res) {
+    let { username, password, fname, lname } = req.body;
+    let user = await User.get(username);
+    if (user) return res.status(400).end('username unavailable');
+    password = crypto.createHash('md5').update(password).digest('hex');
+    User.create({ username, password, fname, lname });
+    const token = createToken(username);
+    res.cookie('jwt-token', token).end();
+}
+
+exports.user = express()
+    .post('/login', login)
+    .post('/register', register);

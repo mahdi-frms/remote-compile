@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const { login } = require('./controller/user')
+const { user } = require('./controller/user')
 
 const PORT = process.env.PORT || 8080;
 const VERSION = process.env.VERSION;
@@ -14,7 +14,7 @@ app.get('/api/version', (req, res) => {
     });
 })
 
-app.post('/api/login', login)
+app.use('/api', user)
 
 app.listen(PORT, () => {
     console.log(`http server listening on port ${PORT}...`);
