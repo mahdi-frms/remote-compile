@@ -1,10 +1,9 @@
-exports.needArgs = (args) => {
-    return async (req, res, next) => {
-        const body = req.body
-        if (!body) return res.status(400).end('json body required')
-        for (const a of args)
-            if (body[a] === undefined)
-                return res.status(400).end(`body parameter ${a} required`)
-        next()
-    }
+const jwt = require('jsonwebtoken')
+const { validationResult } = require('express-validator')
+
+exports.validArgs = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+        return res.status(400).json({ errors: errors.array() });
+    next()
 }

@@ -2,7 +2,8 @@ const User = require('../model/user')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const express = require('express')
-const { needArgs } = require('./util')
+const { body } = require('express-validator')
+const { validArgs } = require('./util')
 
 function createToken(username) {
     return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ async function login(req, res) {
     if (!user) return res.status(400).end('invalid username or password');
     password = crypto.createHash('md5').update(password).digest('hex');
     if (user.password != password) return res.status(400).end('invalid username or password');
-    const token = createToken(username);
+    const token = await createToken(username);
     res.cookie('jwt-token', token).end();
 }
 
@@ -28,11 +29,26 @@ async function register(req, res) {
     let user = await User.get(username);
     if (user) return res.status(400).end('username unavailable');
     password = crypto.createHash('md5').update(password).digest('hex');
-    User.create({ username, password, fname, lname });
-    const token = createToken(username);
+    await User.create({ username, password, fname, lname });
+    const token = await createToken(username);
     res.cookie('jwt-token', token).end();
 }
 
-exports.user = express()
-    .post('/login', needArgs(['username', 'password']), login)
-    .post('/register', needArgs(['username', 'password', 'fname', 'lname']), register);
+let user = express()
+
+user.post('/login',
+    body('username').isString(),
+    body('password').isString(),
+    validArgs, login
+);
+
+
+user.post('/register',
+    body('username').isString(),
+    body('password').isString(),
+    body('fname').isString(),
+    body('lname').isString(),
+    validArgs, register
+);
+
+exports.user = user
