@@ -2,6 +2,7 @@ const User = require('../model/user')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const express = require('express')
+const { needArgs } = require('./util')
 
 function createToken(username) {
     return new Promise((resolve, reject) => {
@@ -33,5 +34,5 @@ async function register(req, res) {
 }
 
 exports.user = express()
-    .post('/login', login)
-    .post('/register', register);
+    .post('/login', needArgs(['username', 'password']), login)
+    .post('/register', needArgs(['username', 'password', 'fname', 'lname']), register);
