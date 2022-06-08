@@ -43,6 +43,22 @@ async function profile(req, res) {
     res.json(user)
 }
 
+// WARNING! this below should NOT be done in any real production environment.
+// charging the account includes sending requests to a payment system
+// and redirecting the user to a gateway and setting an API endpoint
+// to which the gateway redirects the user.
+
+async function charge(req, res) {
+    let { username } = req;
+    let user = await User.get(username);
+    if (!user) return res.status(400).end('invalid username');
+    const extraCredit = req.body.credit;
+    if (extraCredit < 0) res.status(400).end('credit must be a positive integer')
+    user.credit += extraCredit;
+    await User.update(user)
+    res.json({ credit: user.credit })
+}
+
 let user = express()
 
 user.post('/login',
@@ -61,6 +77,11 @@ user.post('/register',
 
 user.get('/profile',
     validAuth, profile
+);
+
+user.post('/charge',
+    body('credit').isInt(),
+    validArgs, validAuth, charge
 );
 
 exports.user = user
