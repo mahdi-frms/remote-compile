@@ -1,4 +1,4 @@
-let { db } = require('../db')
+let { db } = require('./db')
 
 exports.get = async (username) => {
     const user = await db.query('select * from users where username=($1)', [username])
