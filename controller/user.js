@@ -3,7 +3,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const express = require('express')
 const { body } = require('express-validator')
-const { validArgs } = require('./util')
+const { validArgs, validAuth } = require('./util')
 
 function createToken(username) {
     return new Promise((resolve, reject) => {
@@ -34,6 +34,15 @@ async function register(req, res) {
     res.cookie('jwt-token', token).end();
 }
 
+async function profile(req, res) {
+    let { username } = req;
+    let user = await User.get(username);
+    if (!user) return res.status(400).end('invalid username');
+    delete user.password
+    delete user.id
+    res.json(user)
+}
+
 let user = express()
 
 user.post('/login',
@@ -42,13 +51,16 @@ user.post('/login',
     validArgs, login
 );
 
-
 user.post('/register',
     body('username').isString(),
     body('password').isString(),
     body('fname').isString(),
     body('lname').isString(),
     validArgs, register
+);
+
+user.get('/profile',
+    validAuth, profile
 );
 
 exports.user = user
