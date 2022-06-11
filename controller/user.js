@@ -84,12 +84,31 @@ async function chpass(req, res) {
     res.end()
 }
 
+async function chname(req, res) {
+    let { username } = req;
+    let user = await User.get(username);
+    if (!user)
+        return res.status(400).end('invalid username');
+    if (req.body.fname)
+        user.fname = req.body.fname
+    if (req.body.lname)
+        user.lname = req.body.lname
+    await User.update(user)
+    res.end()
+}
+
 let user = express()
 
 user.post('/login',
     body('username').isString(),
     body('password').isString(),
     validArgs, login
+);
+
+user.post('/chname',
+    body('fname').if(body('fname').exists()).isString(),
+    body('lname').if(body('lname').exists()).isString(),
+    validArgs, validAuth, chname
 );
 
 user.post('/register',
