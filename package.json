@@ -8,7 +8,7 @@
   },
   "keywords": [],
   "author": "mahdif <mahdif1380@outlook.com>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.1",
