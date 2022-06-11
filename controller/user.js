@@ -5,6 +5,12 @@ const express = require('express')
 const { body } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
 
+const passwordSalt = '343-354tjigwlf]];.s];r,elw78';
+
+function passwordHash(password) {
+    return crypto.createHash('md5').update(`salt : ${passwordSalt} ${password}`).digest('hex');
+}
+
 function createToken(username) {
     return new Promise((resolve, reject) => {
         jwt.sign({ username }, process.env.JWT_SECRET, (err, token) => {
@@ -18,7 +24,7 @@ async function login(req, res) {
     let { username, password } = req.body;
     let user = await User.get(username);
     if (!user) return res.status(400).end('invalid username or password');
-    password = crypto.createHash('md5').update(password).digest('hex');
+    password = passwordHash(password);
     if (user.password != password) return res.status(400).end('invalid username or password');
     const token = await createToken(username);
     res.cookie('jwt-token', token).end();
@@ -28,7 +34,7 @@ async function register(req, res) {
     let { username, password, fname, lname } = req.body;
     let user = await User.get(username);
     if (user) return res.status(400).end('username unavailable');
-    password = crypto.createHash('md5').update(password).digest('hex');
+    password = passwordHash(password);
     await User.create({ username, password, fname, lname });
     const token = await createToken(username);
     res.cookie('jwt-token', token).end();
@@ -59,6 +65,18 @@ async function charge(req, res) {
     res.json({ credit: user.credit })
 }
 
+async function chpass(req, res) {
+    let { username } = req;
+    let user = await User.get(username);
+    if (!user) return res.status(400).end('invalid username');
+    const password = passwordHash(req.body.oldpass)
+    if (user.password != password)
+        return res.end('invalid password')
+    user.password = passwordHash(req.body.newpass)
+    await User.update(user)
+    res.end()
+}
+
 let user = express()
 
 user.post('/login',
@@ -73,6 +91,12 @@ user.post('/register',
     body('fname').isString(),
     body('lname').isString(),
     validArgs, register
+);
+
+user.post('/chpass',
+    body('newpass').isString(),
+    body('oldpass').isString(),
+    validArgs, validAuth, chpass
 );
 
 user.get('/profile',
