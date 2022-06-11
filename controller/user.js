@@ -57,9 +57,11 @@ async function profile(req, res) {
 async function charge(req, res) {
     let { username } = req;
     let user = await User.get(username);
-    if (!user) return res.status(400).end('invalid username');
+    if (!user)
+        return res.status(400).end('invalid username');
     const extraCredit = req.body.credit;
-    if (extraCredit < 0) res.status(400).end('credit must be a positive integer')
+    if (extraCredit < 0)
+        return res.status(400).end('credit must be a positive integer')
     user.credit += extraCredit;
     await User.update(user)
     res.json({ credit: user.credit })
@@ -108,4 +110,4 @@ user.post('/charge',
     validArgs, validAuth, charge
 );
 
-exports.user = user
+exports.user = user``
