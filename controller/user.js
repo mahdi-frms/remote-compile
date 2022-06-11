@@ -23,9 +23,11 @@ function createToken(username) {
 async function login(req, res) {
     let { username, password } = req.body;
     let user = await User.get(username);
-    if (!user) return res.status(400).end('invalid username or password');
+    if (!user)
+        return res.status(400).end('invalid username or password');
     password = passwordHash(password);
-    if (user.password != password) return res.status(400).end('invalid username or password');
+    if (user.password != password)
+        return res.status(400).end('invalid username or password');
     const token = await createToken(username);
     res.cookie('jwt-token', token).end();
 }
@@ -33,7 +35,8 @@ async function login(req, res) {
 async function register(req, res) {
     let { username, password, fname, lname } = req.body;
     let user = await User.get(username);
-    if (user) return res.status(400).end('username unavailable');
+    if (user)
+        return res.status(400).end('username unavailable');
     password = passwordHash(password);
     await User.create({ username, password, fname, lname });
     const token = await createToken(username);
@@ -43,7 +46,8 @@ async function register(req, res) {
 async function profile(req, res) {
     let { username } = req;
     let user = await User.get(username);
-    if (!user) return res.status(400).end('invalid username');
+    if (!user)
+        return res.status(400).end('invalid username');
     delete user.password
     delete user.id
     res.json(user)
@@ -70,7 +74,8 @@ async function charge(req, res) {
 async function chpass(req, res) {
     let { username } = req;
     let user = await User.get(username);
-    if (!user) return res.status(400).end('invalid username');
+    if (!user)
+        return res.status(400).end('invalid username');
     const password = passwordHash(req.body.oldpass)
     if (user.password != password)
         return res.end('invalid password')
