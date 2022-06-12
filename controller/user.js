@@ -66,8 +66,8 @@ async function charge(req, res) {
     const extraCredit = req.body.credit;
     if (extraCredit < 0)
         return res.status(400).end('credit must be a positive integer')
-    user.credit += extraCredit;
-    await userdb.update(user)
+    const credit = user.credit + extraCredit;
+    await userdb.updateCredit(user, credit)
     res.json({ credit: user.credit })
 }
 
@@ -76,11 +76,11 @@ async function chpass(req, res) {
     let user = await userdb.get(username);
     if (!user)
         return res.status(400).end('invalid username');
-    const password = passwordHash(req.body.oldpass)
+    let password = passwordHash(req.body.oldpass)
     if (user.password != password)
         return res.end('invalid password')
-    user.password = passwordHash(req.body.newpass)
-    await userdb.update(user)
+    password = passwordHash(req.body.newpass)
+    await userdb.updatePass(user, password)
     res.end()
 }
 
@@ -89,11 +89,13 @@ async function chname(req, res) {
     let user = await userdb.get(username);
     if (!user)
         return res.status(400).end('invalid username');
+    let fname = null
+    let lname = null
     if (req.body.fname)
-        user.fname = req.body.fname
+        fname = req.body.fname
     if (req.body.lname)
-        user.lname = req.body.lname
-    await userdb.update(user)
+        lname = req.body.lname
+    await userdb.updateName(user, fname, lname)
     res.end()
 }
 
