@@ -44,10 +44,7 @@ async function register(req, res) {
 }
 
 async function profile(req, res) {
-    let { username } = req;
-    let user = await userdb.get(username);
-    if (!user)
-        return res.status(400).end('invalid username');
+    let { user } = req;
     delete user.password
     delete user.id
     res.json(user)
@@ -59,10 +56,7 @@ async function profile(req, res) {
 // to which the gateway redirects the user.
 
 async function charge(req, res) {
-    let { username } = req;
-    let user = await userdb.get(username);
-    if (!user)
-        return res.status(400).end('invalid username');
+    let { user } = req;
     const extraCredit = req.body.credit;
     if (extraCredit < 0)
         return res.status(400).end('credit must be a positive integer')
@@ -72,10 +66,7 @@ async function charge(req, res) {
 }
 
 async function chpass(req, res) {
-    let { username } = req;
-    let user = await userdb.get(username);
-    if (!user)
-        return res.status(400).end('invalid username');
+    let { user } = req;
     let password = passwordHash(req.body.oldpass)
     if (user.password != password)
         return res.end('invalid password')
@@ -85,10 +76,7 @@ async function chpass(req, res) {
 }
 
 async function chname(req, res) {
-    let { username } = req;
-    let user = await userdb.get(username);
-    if (!user)
-        return res.status(400).end('invalid username');
+    let { user } = req;
     let fname = null
     let lname = null
     if (req.body.fname)
