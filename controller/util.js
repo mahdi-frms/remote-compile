@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { validationResult } = require('express-validator')
+const userdb = require('../model/user')
 
 exports.validArgs = async (req, res, next) => {
     const errors = validationResult(req);
@@ -11,7 +12,7 @@ exports.validArgs = async (req, res, next) => {
 exports.validAuth = async (req, res, next) => {
     const token = req.cookies['jwt-token']
     if (!token) return res.status(401).end(`authentication required`)
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
         if (err)
             return res.status(401).end(`authentication failed : invalid token`)
         const user = await userdb.get(decoded.username);

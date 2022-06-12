@@ -5,7 +5,7 @@ const express = require('express')
 const { body } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
 
-const passwordSalt = '343-354tjigwlf]];.s];r,elw78';
+const passwordSalt = process.env.MD5_SALT;
 
 function passwordHash(password) {
     return crypto.createHash('md5').update(`salt : ${passwordSalt} ${password}`).digest('hex');
