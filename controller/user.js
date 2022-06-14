@@ -87,21 +87,21 @@ async function chname(req, res) {
     res.end()
 }
 
-let user = express()
+let userRoute = express()
 
-user.post('/login',
+userRoute.post('/login',
     body('username').isString(),
     body('password').isString(),
     validArgs, login
 );
 
-user.post('/chname',
+userRoute.post('/chname',
     body('fname').if(body('fname').exists()).isString(),
     body('lname').if(body('lname').exists()).isString(),
     validArgs, validAuth, chname
 );
 
-user.post('/register',
+userRoute.post('/register',
     body('username').isString(),
     body('password').isString(),
     body('fname').isString(),
@@ -109,19 +109,19 @@ user.post('/register',
     validArgs, register
 );
 
-user.post('/chpass',
+userRoute.post('/chpass',
     body('newpass').isString(),
     body('oldpass').isString(),
     validArgs, validAuth, chpass
 );
 
-user.get('/profile',
+userRoute.get('/profile',
     validAuth, profile
 );
 
-user.post('/charge',
+userRoute.post('/charge',
     body('credit').isInt(),
     validArgs, validAuth, charge
 );
 
-exports.user = user
+exports.user = userRoute
