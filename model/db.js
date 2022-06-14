@@ -11,14 +11,21 @@ function db() {
 
     this.query = async (queryString, values) => {
         let client = await this.pool.connect();
-        const result = await client.query(queryString, values);
-        await client.release();
-        return result;
+        try {
+            return await client.query(queryString, values);
+        }
+        finally {
+            await client.release();
+        }
     }
     this.execute = async (queryString, values) => {
         let client = await this.pool.connect();
-        await client.query(queryString, values);
-        await client.end();
+        try {
+            await client.query(queryString, values);
+        }
+        finally {
+            await client.end();
+        }
     }
 }
 
