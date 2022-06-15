@@ -2,6 +2,7 @@ const express = require('express')
 const projdb = require('../model/project')
 const { param } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
+const pconf = require('./pconf');
 
 let projRoute = express()
 
@@ -18,6 +19,8 @@ async function postProject(req, res) {
     const { user } = req;
     const name = req.params.project;
     const config = req.body;
+    if (!pconf.validate(config))
+        return res.status(400).end('project configuration out of format');
     if (!await projdb.create({ name, config, uid: user.id }))
         return res.status(400).end('unavailable project name');
     res.end();
