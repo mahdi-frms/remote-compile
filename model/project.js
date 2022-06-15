@@ -8,6 +8,10 @@ exports.get = async (name, uid) => {
         return user.rows[0]
 }
 
+exports.getAll = async (uid) => {
+    return await (await db.query('select * from projects where uid=$1;', [uid])).rows;
+}
+
 exports.create = async (user) => {
     try {
         await db.execute('insert into projects (uid,name,config) values ($1,$2,$3);', [

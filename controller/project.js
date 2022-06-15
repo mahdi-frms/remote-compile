@@ -15,6 +15,18 @@ async function getProject(req, res) {
     res.json(project);
 }
 
+async function getProjects(req, res) {
+    const { user } = req;
+    let projects = await projdb.getAll(user.id);
+    projects = projects.map((p) => {
+        return {
+            name: p.name,
+            config: p.config,
+        }
+    });
+    res.json(projects);
+}
+
 async function postProject(req, res) {
     const { user } = req;
     const name = req.params.project;
@@ -39,6 +51,10 @@ async function putProject(req, res) {
 projRoute.get('/project/:project',
     param('project').isString(),
     validArgs, validAuth, getProject
+)
+
+projRoute.get('/projects/',
+    validAuth, getProjects
 )
 
 projRoute.post('/project/:project',
