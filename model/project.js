@@ -21,3 +21,17 @@ exports.create = async (user) => {
         return false
     }
 }
+
+exports.update = async (user) => {
+    try {
+        await db.execute('update projects set config=$1 where name=$2 and uid=$3;', [
+            user.config,
+            user.name,
+            user.uid
+        ]);
+        return true
+    }
+    catch (err) {
+        return false
+    }
+}

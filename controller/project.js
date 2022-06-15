@@ -26,6 +26,16 @@ async function postProject(req, res) {
     res.end();
 }
 
+async function putProject(req, res) {
+    const { user } = req;
+    const name = req.params.project;
+    const config = req.body;
+    if (!pconf.validate(config))
+        return res.status(400).end('project configuration out of format');
+    await projdb.update({ name, config, uid: user.id })
+    res.end();
+}
+
 projRoute.get('/project/:project',
     param('project').isString(),
     validArgs, validAuth, getProject
@@ -34,6 +44,11 @@ projRoute.get('/project/:project',
 projRoute.post('/project/:project',
     param('project').isString(),
     validArgs, validAuth, postProject
+)
+
+projRoute.put('/project/:project',
+    param('project').isString(),
+    validArgs, validAuth, putProject
 )
 
 exports.project = projRoute
