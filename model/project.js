@@ -1,41 +1,41 @@
-let { db } = require('./db')
+let { db } = require('./db');
 
 exports.get = async (name, uid) => {
-    const user = await db.query('select * from projects where name=($1) and uid=($2);', [name, uid])
-    if (!user.rowCount)
-        return null
+    const project = await db.query('select * from projects where name=$1 and uid=$2;', [name, uid]);
+    if (!project.rowCount)
+        return null;
     else
-        return user.rows[0]
+        return project.rows[0];
 }
 
 exports.getAll = async (uid) => {
     return await (await db.query('select * from projects where uid=$1;', [uid])).rows;
 }
 
-exports.create = async (user) => {
+exports.create = async (project) => {
     try {
         await db.execute('insert into projects (uid,name,config) values ($1,$2,$3);', [
-            user.uid,
-            user.name,
-            user.config
+            project.uid,
+            project.name,
+            project.config
         ]);
-        return true
+        return true;
     }
     catch (err) {
-        return false
+        return false;
     }
 }
 
-exports.update = async (user) => {
+exports.update = async (project) => {
     try {
         await db.execute('update projects set config=$1 where name=$2 and uid=$3;', [
-            user.config,
-            user.name,
-            user.uid
+            project.config,
+            project.name,
+            project.uid
         ]);
-        return true
+        return true;
     }
     catch (err) {
-        return false
+        return false;
     }
 }
