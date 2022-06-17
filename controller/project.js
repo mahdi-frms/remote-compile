@@ -54,6 +54,7 @@ async function postProject(req, res) {
         return res.status(400).end('no build server available');
     if (!await projdb.create({ name, config, uid: user.id, sid: server.id }))
         return res.status(400).end('unavailable project name');
+    await srvdb.updateProjects(server.id)
     res.end();
 }
 
