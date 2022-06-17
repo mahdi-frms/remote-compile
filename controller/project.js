@@ -25,7 +25,7 @@ async function getProject(req, res) {
     const { user } = req;
     const project = await projdb.get(req.params.project, user.id);
     if (!project)
-        return res.status(400).end('project not found');
+        return res.status(404).end('project not found');
     delete project.id;
     res.json(project);
 }
@@ -68,7 +68,7 @@ async function putProjectFile(req, res) {
     const { user } = req;
     project = await projdb.get(project, user.id);
     if (!project)
-        return res.status(400).end('project not found');
+        return res.status(404).end('project not found');
     const files = pconf.getTreeFiles(project.config.tree)
     if (!files.includes(file))
         return res.status(400).end('file not in project tree');
@@ -81,7 +81,7 @@ async function getProjectFile(req, res) {
     const { user } = req;
     project = await projdb.get(project, user.id);
     if (!project)
-        return res.status(400).end('project not found');
+        return res.status(404).end('project not found');
     try {
         const content = await minioClient.getObject(minioFilesBucket, getFileName(user.id, project.id, file))
         content.pipe(res)
