@@ -94,8 +94,7 @@ async function getProjectFile(req, res) {
 }
 
 projRoute.get('/project/:project',
-    param('project').isString(),
-    validArgs, validAuth, getProject
+    validAuth, getProject
 )
 
 projRoute.get('/projects/',
@@ -103,22 +102,21 @@ projRoute.get('/projects/',
 )
 
 projRoute.post('/project/:project',
-    param('project').isString(),
-    validArgs, validAuth, postProject
+    validAuth, postProject
 )
 
 projRoute.put('/project/:project',
-    param('project').isString(),
-    validArgs, validAuth, putProject
+    validAuth, putProject
 )
 
 projRoute.put('/project/:project/files/:file',
-    express.text(), param('file').toInt(),
+    express.text(),
+    param('file').isInt().toInt(),
     validArgs, validAuth, putProjectFile
 )
 
 projRoute.get('/project/:project/files/:file',
-    param('file').toInt(),
+    param('file').isInt().toInt(),
     validArgs, validAuth, getProjectFile
 )
 
