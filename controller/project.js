@@ -3,6 +3,17 @@ const projdb = require('../model/project')
 const { param } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
 const pconf = require('./pconf');
+const minio = require('minio');
+
+const minioFilesBucket = 'projsrc'
+
+let minioClient = new minio.Client({
+    port: Number(process.env.MINIO_PORT),
+    endPoint: process.env.MINIO_ENDPOINT,
+    accessKey: process.env.MINIO_ACCESSKEY,
+    secretKey: process.env.MINIO_SECRETKEY,
+    useSSL: false
+})
 
 let projRoute = express()
 
@@ -48,6 +59,19 @@ async function putProject(req, res) {
     res.end();
 }
 
+async function putProjectFile(req, res) {
+    let { project, file } = req.params
+    const { user } = req;
+    project = await projdb.get(project, user.id);
+    if (!project)
+        return res.status(400).end('project not found');
+    const files = pconf.getTreeFiles(project.config.tree)
+    if (!files.includes(file))
+        return res.status(400).end('file not in project tree');
+    await minioClient.putObject(minioFilesBucket, `${user.id}-${project.id}-${file}`, req.body)
+    res.end()
+}
+
 projRoute.get('/project/:project',
     param('project').isString(),
     validArgs, validAuth, getProject
@@ -65,6 +89,11 @@ projRoute.post('/project/:project',
 projRoute.put('/project/:project',
     param('project').isString(),
     validArgs, validAuth, putProject
+)
+
+projRoute.put('/project/:project/files/:file',
+    express.text(), param('file').toInt(),
+    validArgs, validAuth, putProjectFile
 )
 
 exports.project = projRoute

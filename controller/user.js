@@ -88,6 +88,7 @@ async function chname(req, res) {
 }
 
 let userRoute = express()
+userRoute.use(express.json())
 
 userRoute.post('/login',
     body('username').isString(),

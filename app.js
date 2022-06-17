@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 8080;
 const VERSION = process.env.VERSION;
 
 let app = express()
-app.use(express.json())
 app.use(cookieParser())
 app.get('/api/version', (req, res) => {
     res.send({

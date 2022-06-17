@@ -12,11 +12,11 @@ function validateTree(tree) {
     return true;
 }
 
-function TreeFiles(tree) {
+function getTreeFiles(tree) {
     let arr = [];
     for (const entry in tree) {
         if (tree[entry] instanceof Object) {
-            arr = arr.concat(TreeFiles(tree[entry]));
+            arr = arr.concat(getTreeFiles(tree[entry]));
         }
         else {
             arr.push(tree[entry]);
@@ -95,7 +95,7 @@ function validate(config) {
         return false;
     if (!validateTree(config.tree))
         return false;
-    const treeFiles = TreeFiles(config.tree);
+    const treeFiles = getTreeFiles(config.tree);
     if (!allUnique(treeFiles))
         return false;
 
@@ -112,3 +112,4 @@ function validate(config) {
 }
 
 exports.validate = validate;
+exports.getTreeFiles = getTreeFiles;
