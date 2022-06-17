@@ -17,8 +17,8 @@ let minioClient = new minio.Client({
 
 let projRoute = express()
 
-function getFileName(uid, pid, fid) {
-    return `${uid}-${pid}-${fid}`
+function getFileName(pid, fid) {
+    return `${pid}-${fid}`
 }
 
 async function getProject(req, res) {
@@ -74,7 +74,7 @@ async function putProjectFile(req, res) {
     const files = pconf.getTreeFiles(project.config.tree)
     if (!files.includes(file))
         return res.status(400).end('file not in project tree');
-    await minioClient.putObject(minioFilesBucket, getFileName(user.id, project.id, file), req.body)
+    await minioClient.putObject(minioFilesBucket, getFileName(project.id, file), req.body)
     res.end()
 }
 
@@ -85,7 +85,7 @@ async function getProjectFile(req, res) {
     if (!project)
         return res.status(404).end('project not found');
     try {
-        const content = await minioClient.getObject(minioFilesBucket, getFileName(user.id, project.id, file))
+        const content = await minioClient.getObject(minioFilesBucket, getFileName(project.id, file))
         content.pipe(res)
     }
     catch (err) {
