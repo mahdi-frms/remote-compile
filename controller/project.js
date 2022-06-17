@@ -1,5 +1,6 @@
 const express = require('express')
 const projdb = require('../model/project')
+const srvdb = require('../model/server')
 const { param } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
 const pconf = require('./pconf');
@@ -48,7 +49,10 @@ async function postProject(req, res) {
     const config = req.body;
     if (!pconf.validate(config))
         return res.status(400).end('project configuration out of format');
-    if (!await projdb.create({ name, config, uid: user.id }))
+    const server = await srvdb.getMin();
+    if (!server)
+        return res.status(400).end('no build server available');
+    if (!await projdb.create({ name, config, uid: user.id, sid: server.id }))
         return res.status(400).end('unavailable project name');
     res.end();
 }
@@ -59,7 +63,7 @@ async function putProject(req, res) {
     const config = req.body;
     if (!pconf.validate(config))
         return res.status(400).end('project configuration out of format');
-    const rsl = await projdb.update({ name, config, uid: user.id })
+    const rsl = await projdb.updateConfig({ name, config, uid: user.id })
     if (!rsl)
         return res.status(404).end('project not found');
     res.end();

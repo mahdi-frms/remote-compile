@@ -14,10 +14,11 @@ exports.getAll = async (uid) => {
 
 exports.create = async (project) => {
     try {
-        await db.execute('insert into projects (uid,name,config) values ($1,$2,$3);', [
+        await db.execute('insert into projects (uid,name,config,status,sid) values ($1,$2,$3,0,$4);', [
             project.uid,
             project.name,
-            project.config
+            project.config,
+            project.sid
         ]);
         return true;
     }
@@ -26,7 +27,7 @@ exports.create = async (project) => {
     }
 }
 
-exports.update = async (project) => {
+exports.updateConfig = async (project) => {
     const rsl = await db.query('update projects set config=$1 where name=$2 and uid=$3;', [
         project.config,
         project.name,
