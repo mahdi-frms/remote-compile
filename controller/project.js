@@ -59,7 +59,9 @@ async function putProject(req, res) {
     const config = req.body;
     if (!pconf.validate(config))
         return res.status(400).end('project configuration out of format');
-    await projdb.update({ name, config, uid: user.id })
+    const rsl = await projdb.update({ name, config, uid: user.id })
+    if (!rsl)
+        return res.status(404).end('project not found');
     res.end();
 }
 

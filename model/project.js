@@ -27,15 +27,10 @@ exports.create = async (project) => {
 }
 
 exports.update = async (project) => {
-    try {
-        await db.execute('update projects set config=$1 where name=$2 and uid=$3;', [
-            project.config,
-            project.name,
-            project.uid
-        ]);
-        return true;
-    }
-    catch (err) {
-        return false;
-    }
+    const rsl = await db.query('update projects set config=$1 where name=$2 and uid=$3;', [
+        project.config,
+        project.name,
+        project.uid
+    ]);
+    return Boolean(rsl.rowCount);
 }
