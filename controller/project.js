@@ -109,13 +109,13 @@ projRoute.put('/project/:project',
     validAuth, putProject
 )
 
-projRoute.put('/project/:project/files/:file',
+projRoute.put('/project/:project/file/:file',
     express.text(),
     param('file').isInt().toInt(),
     validArgs, validAuth, putProjectFile
 )
 
-projRoute.get('/project/:project/files/:file',
+projRoute.get('/project/:project/file/:file',
     param('file').isInt().toInt(),
     validArgs, validAuth, getProjectFile
 )
