@@ -76,7 +76,7 @@ function validateTarget(target) {
                 return false;
         }
         else if (arg == 'output') {
-            if (!target.output in ['bin', 'ar'])
+            if (!['bin', 'ar'].includes(target.output))
                 return false;
         }
         else
@@ -105,7 +105,7 @@ function validate(config) {
         if (!validateTarget(config.targets[target]))
             return false;
         for (const file of config.targets[target].src)
-            if (!file in treeFiles)
+            if (!treeFiles.includes(file))
                 return false;
     }
     return true;
