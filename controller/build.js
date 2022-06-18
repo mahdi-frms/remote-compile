@@ -1,7 +1,4 @@
 import * as buildb from '../model/build.js'
-import express from 'express'
-import { param } from 'express-validator'
-import { validArgs, validAuth } from './util.js'
 import * as minio from 'minio'
 
 const minioTargetsBucket = 'buildtar'
@@ -13,8 +10,6 @@ let minioClient = new minio.Client({
     secretKey: process.env.MINIO_SECRETKEY,
     useSSL: false
 })
-
-let buildRoute = express()
 
 async function getBuildStatus(req, res) {
     const authUser = req.user;
