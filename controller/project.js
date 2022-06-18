@@ -2,9 +2,6 @@ import * as projdb from '../model/project.js'
 import * as buildb from '../model/build.js'
 import * as srvdb from '../model/server.js'
 import * as filedb from '../model/file.js'
-import express from 'express'
-import { param } from 'express-validator'
-import { validArgs, validAuth, validSecret } from './util.js'
 import * as minio from 'minio'
 import * as pconf from './pconf.js'
 import { got } from 'got';
@@ -18,8 +15,6 @@ let minioClient = new minio.Client({
     secretKey: process.env.MINIO_SECRETKEY,
     useSSL: false
 })
-
-let projRoute = express()
 
 function getFileKey(pid, fid) {
     return `${pid}-${fid}`
@@ -134,47 +129,10 @@ async function postProjectNotify(req, res) {
     res.end()
 }
 
-projRoute.get('/project/:project',
-    param('project').isLength({ max: 50 }),
-    validAuth, getProject
-)
-
-projRoute.get('/projects/',
-    param('project').isLength({ max: 50 }),
-    validAuth, getProjects
-)
-
-projRoute.post('/project/:project',
-    param('project').isLength({ max: 50 }),
-    validAuth, postProject
-)
-
-projRoute.put('/project/:project',
-    param('project').isLength({ max: 50 }),
-    validAuth, putProject
-)
-
-projRoute.put('/project/:project/file/:file',
-    express.text(),
-    param('project').isLength({ max: 50 }),
-    param('file').isInt().toInt(),
-    validArgs, validAuth, putProjectFile
-)
-
-projRoute.get('/project/:project/file/:file',
-    param('project').isLength({ max: 50 }),
-    param('file').isInt().toInt(),
-    validArgs, validAuth, getProjectFile
-)
-
-projRoute.post('/project/:project/build',
-    param('project').isLength({ max: 50 }),
-    validAuth, postProjectBuild
-)
-
-projRoute.post('/project/:pid/notify',
-    param('pid').isInt().toInt(),
-    validSecret, postProjectNotify
-)
-
-export { projRoute as project }
+export {
+    getProject, postProject, putProject,
+    getProjects,
+    getProjectFile, putProjectFile,
+    postProjectBuild,
+    postProjectNotify,
+}
