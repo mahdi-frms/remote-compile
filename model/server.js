@@ -8,6 +8,14 @@ exports.getMin = async () => {
         return project.rows[0];
 }
 
+exports.get = async (id) => {
+    const project = await db.query('select * from servers where id=$1;', [id]);
+    if (!project.rowCount)
+        return null;
+    else
+        return project.rows[0];
+}
+
 exports.updateProjects = async (id) => {
     await db.execute('update servers set projects=projects+1 where id=$1;', [id]);
 }

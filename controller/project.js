@@ -24,6 +24,10 @@ function getFileKey(pid, fid) {
     return `${pid}-${fid}`
 }
 
+async function requestBuild(server, buildId) {
+    // todo
+}
+
 async function getProject(req, res) {
     const { user } = req;
     const project = await projdb.get(req.params.project, user.id);
@@ -111,7 +115,8 @@ async function postProjectBuild(req, res) {
     if (!await projdb.initBuild(project))
         return res.status(400).end('project is being built');
     buildId = await buildb.create({ pid: project.id })
-    // requestBuild(project.sid,buildId)
+    const server = await srvdb.get(project.sid)
+    await requestBuild(server, buildId)
     res.json({ buildId })
 }
 
