@@ -61,19 +61,4 @@ async function getBuildTarget(req, res) {
     }
 }
 
-buildRoute.get('/build/:build/status',
-    param('build').isInt().toInt(),
-    validArgs, validAuth, getBuildStatus
-)
-
-buildRoute.get('/build/:build/log',
-    param('build').isInt().toInt(),
-    validArgs, validAuth, getBuildLog
-)
-
-buildRoute.get('/build/:build/target/:target',
-    param('build').isInt().toInt(),
-    validArgs, validAuth, getBuildTarget
-)
-
-export { buildRoute as build }
+export { getBuildLog, getBuildStatus, getBuildTarget }

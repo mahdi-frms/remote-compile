@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import { user } from './routes/user.js'
 import { project } from './routes/project.js'
-import { build } from './controller/build.js'
+import { build } from './routes/build.js'
 
 const PORT = process.env.PORT || 8080;
 const VERSION = process.env.VERSION;
