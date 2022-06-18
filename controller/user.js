@@ -91,28 +91,28 @@ let userRoute = express()
 userRoute.use(express.json())
 
 userRoute.post('/login',
-    body('username').isString(),
-    body('password').isString(),
+    body('username').isString().isLength({ max: 50 }),
+    body('password').isString().isLength({ max: 50 }),
     validArgs, login
 );
 
 userRoute.post('/chname',
-    body('fname').if(body('fname').exists()).isString(),
-    body('lname').if(body('lname').exists()).isString(),
+    body('fname').if(body('fname').exists()).isString().isLength({ max: 50 }),
+    body('lname').if(body('lname').exists()).isString().isLength({ max: 50 }),
     validArgs, validAuth, chname
 );
 
 userRoute.post('/register',
-    body('username').isString(),
-    body('password').isString(),
-    body('fname').isString(),
-    body('lname').isString(),
+    body('username').isString().isLength({ max: 50 }),
+    body('password').isString().isLength({ max: 50 }),
+    body('fname').isString().isLength({ max: 50 }),
+    body('lname').isString().isLength({ max: 50 }),
     validArgs, register
 );
 
 userRoute.post('/chpass',
-    body('newpass').isString(),
-    body('oldpass').isString(),
+    body('newpass').isString().isLength({ max: 50 }),
+    body('oldpass').isString().isLength({ max: 50 }),
     validArgs, validAuth, chpass
 );
 

@@ -120,33 +120,40 @@ async function postProjectBuild(req, res) {
 }
 
 projRoute.get('/project/:project',
+    param('project').isLength({ max: 50 }),
     validAuth, getProject
 )
 
 projRoute.get('/projects/',
+    param('project').isLength({ max: 50 }),
     validAuth, getProjects
 )
 
 projRoute.post('/project/:project',
+    param('project').isLength({ max: 50 }),
     validAuth, postProject
 )
 
 projRoute.put('/project/:project',
+    param('project').isLength({ max: 50 }),
     validAuth, putProject
 )
 
 projRoute.put('/project/:project/file/:file',
     express.text(),
+    param('project').isLength({ max: 50 }),
     param('file').isInt().toInt(),
     validArgs, validAuth, putProjectFile
 )
 
 projRoute.get('/project/:project/file/:file',
+    param('project').isLength({ max: 50 }),
     param('file').isInt().toInt(),
     validArgs, validAuth, getProjectFile
 )
 
 projRoute.post('/project/:project/build',
+    param('project').isLength({ max: 50 }),
     validAuth, postProjectBuild
 )
 
