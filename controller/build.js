@@ -1,8 +1,8 @@
-const express = require('express')
-const buildb = require('../model/build')
-const { param } = require('express-validator')
-const { validArgs, validAuth } = require('./util')
-const minio = require('minio');
+import * as buildb from '../model/build.js'
+import express from 'express'
+import { param } from 'express-validator'
+import { validArgs, validAuth } from './util.js'
+import * as minio from 'minio'
 
 const minioTargetsBucket = 'buildtar'
 
@@ -76,4 +76,4 @@ buildRoute.get('/build/:build/target/:target',
     validArgs, validAuth, getBuildTarget
 )
 
-exports.build = buildRoute
+export { buildRoute as build }

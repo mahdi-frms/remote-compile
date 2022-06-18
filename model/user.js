@@ -1,6 +1,6 @@
-let { db } = require('./db');
+import * as db from './db.js'
 
-exports.get = async (username) => {
+async function get(username) {
     const user = await db.query('select * from users where username=($1);', [username]);
     if (!user.rowCount)
         return null;
@@ -8,7 +8,7 @@ exports.get = async (username) => {
         return user.rows[0];
 }
 
-exports.create = async (user) => {
+async function create(user) {
     await db.execute('insert into users (fname,lname,username,password,credit) values ($1,$2,$3,$4,$5);', [
         user.fname,
         user.lname,
@@ -18,7 +18,7 @@ exports.create = async (user) => {
     ]);
 }
 
-exports.updateName = async (user, fname, lname) => {
+async function updateName(user, fname, lname) {
     const { username } = user;
     if (fname && lname) {
         user.fname = fname;
@@ -35,14 +35,16 @@ exports.updateName = async (user, fname, lname) => {
     }
 }
 
-exports.updatePass = async (user, password) => {
+async function updatePass(user, password) {
     const { username } = user;
     user.password = password;
     await db.execute(`update users set password=$1 where username=$2`, [password, username]);
 }
 
-exports.updateCredit = async (user, credit) => {
+async function updateCredit(user, credit) {
     const { username } = user;
     user.credit = credit;
     await db.execute(`update users set credit=$1 where username=$2`, [credit, username]);
 }
+
+export { updateCredit, updatePass, updateName, get, create }

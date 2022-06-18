@@ -1,12 +1,13 @@
-const express = require('express')
-const projdb = require('../model/project')
-const srvdb = require('../model/server')
-const buildb = require('../model/build')
-const filedb = require('../model/file')
-const { param } = require('express-validator')
-const { validArgs, validAuth, validSecret } = require('./util')
-const pconf = require('./pconf');
-const minio = require('minio');
+import * as projdb from '../model/project.js'
+import * as buildb from '../model/build.js'
+import * as srvdb from '../model/server.js'
+import * as filedb from '../model/file.js'
+import express from 'express'
+import { param } from 'express-validator'
+import { validArgs, validAuth, validSecret } from './util.js'
+import * as minio from 'minio'
+import * as pconf from './pconf.js'
+import { got } from 'got';
 
 const minioFilesBucket = 'projsrc'
 
@@ -25,7 +26,11 @@ function getFileKey(pid, fid) {
 }
 
 async function requestBuild(server, buildId) {
-    // todo
+    const URL = `${server.endPoint}:${server.port}/build/${buildId}`
+    const res = await got.post(URL);
+    if (res.statusCode != 200)
+        return false;
+    return true;
 }
 
 async function getProject(req, res) {
@@ -115,7 +120,9 @@ async function postProjectBuild(req, res) {
     if (!await projdb.initBuild(project))
         return res.status(400).end('project is being built');
     buildId = await buildb.create({ pid: project.id })
-    await requestBuild(server, buildId)
+    const buildReuqestResult = await requestBuild(server, buildId)
+    if (!buildReuqestResult)
+        return res.status(400).end('all source files must be uploaded before build');
     res.json({ buildId })
 }
 
@@ -170,4 +177,4 @@ projRoute.post('/project/:pid/notify',
     validSecret, postProjectNotify
 )
 
-exports.project = projRoute
+export { projRoute as project }

@@ -1,4 +1,4 @@
-const path = require('path');
+import * as path from 'path'
 
 function validateTree(tree) {
     for (const entry in tree) {
@@ -111,5 +111,4 @@ function validate(config) {
     return true;
 }
 
-exports.validate = validate;
-exports.getTreeFiles = getTreeFiles;
+export { validate, getTreeFiles }

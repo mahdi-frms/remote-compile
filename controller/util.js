@@ -1,15 +1,15 @@
-const jwt = require('jsonwebtoken')
-const { validationResult } = require('express-validator')
-const userdb = require('../model/user')
+import * as jwt from 'jsonwebtoken'
+import * as userdb from '../model/user.js'
+import { validationResult } from 'express-validator'
 
-exports.validArgs = async (req, res, next) => {
+async function validArgs(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty())
         return res.status(400).json({ errors: errors.array() });
     next()
 }
 
-exports.validAuth = async (req, res, next) => {
+async function validAuth(req, res, next) {
     const token = req.cookies['jwt-token']
     if (!token) return res.status(401).end(`authentication required`)
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
@@ -23,7 +23,7 @@ exports.validAuth = async (req, res, next) => {
     })
 }
 
-exports.validSecret = async (req, res, next) => {
+async function validSecret(req, res, next) {
     const token = req.cookies['rcs-secret']
     if (!token)
         return res.status(400).end('this API call requires special privileges');
@@ -31,3 +31,5 @@ exports.validSecret = async (req, res, next) => {
         return res.status(401).end('authentication failed : invalid rcs secret');
     next()
 }
+
+export { validArgs, validSecret, validAuth }

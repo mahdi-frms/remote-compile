@@ -1,4 +1,4 @@
-let { db } = require('./db');
+import { db } from './db.js'
 
 const Status = {
     Compiling: 0,
@@ -6,14 +6,12 @@ const Status = {
     Failure: 2
 }
 
-exports.Status = Status;
-
-exports.create = async (build) => {
+async function create(build) {
     const rsl = await db.query('insert into builds (pid) values ($1) returning id;', [build.pid]);
     return rsl.rows[0].id
 }
 
-exports.getProjectUser = async (id, uid) => {
+async function getProjectUser(id, uid) {
     let rsl = await db.query(
         `select B.status as bstatus, P.status as pstatus, B.id as bid, * 
         from builds as B join projects as P on B.pid=P.id join users as U on P.uid=U.id
@@ -52,9 +50,11 @@ exports.getProjectUser = async (id, uid) => {
     return { user, project, build };
 }
 
-exports.getTarget = async (id, tarname) => {
+async function getTarget(id, tarname) {
     const rsl = await db.query('select objkey from targets where bid=$1 and name=$2;', [id, tarname]);
     if (rsl.rowCount == 0)
         return null;
     return rsl.rows[0];
 }
+
+export { create, getProjectUser, getTarget, Status }

@@ -1,10 +1,10 @@
-require('dotenv').config();
+import { } from 'dotenv/config'
 
-const cookieParser = require('cookie-parser')
-const express = require('express');
-const { user } = require('./controller/user')
-const { project } = require('./controller/project')
-const { build } = require('./controller/build')
+import cookieParser from 'cookie-parser'
+import express from 'express'
+import { user } from './controller/user.js'
+import { project } from './controller/project.js'
+import { build } from './controller/build.js'
 
 const PORT = process.env.PORT || 8080;
 const VERSION = process.env.VERSION;

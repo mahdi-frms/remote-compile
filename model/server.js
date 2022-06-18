@@ -1,6 +1,6 @@
-let { db } = require('./db');
+import { db } from './db.js'
 
-exports.getMin = async () => {
+async function getMin() {
     const project = await db.query('select * from servers order by projects asc limit 1;');
     if (!project.rowCount)
         return null;
@@ -8,7 +8,7 @@ exports.getMin = async () => {
         return project.rows[0];
 }
 
-exports.get = async (id) => {
+async function get(id) {
     const project = await db.query('select * from servers where id=$1;', [id]);
     if (!project.rowCount)
         return null;
@@ -16,6 +16,8 @@ exports.get = async (id) => {
         return project.rows[0];
 }
 
-exports.updateProjects = async (id) => {
+async function updateProjects(id) {
     await db.execute('update servers set projects=projects+1 where id=$1;', [id]);
 }
+
+export { get, getMin, updateProjects }

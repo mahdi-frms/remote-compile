@@ -1,8 +1,10 @@
-let { db } = require('./db');
+import { db } from './db.js'
 
-exports.create = async (pid, fid, key) => {
+async function create(pid, fid, key) {
     try {
         await db.execute('insert into files (pid,fid,objkey) values ($1,$2,$3);', [pid, fid, key]);
     }
     catch (_) { }
 }
+
+export { create }

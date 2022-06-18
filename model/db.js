@@ -1,4 +1,4 @@
-const pg = require('pg');
+import pg from 'pg'
 
 function db() {
 
@@ -29,4 +29,6 @@ function db() {
     }
 }
 
-exports.db = new db();
+let dbObj = new db()
+
+export { dbObj as db };

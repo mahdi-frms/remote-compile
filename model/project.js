@@ -1,13 +1,11 @@
-let { db } = require('./db');
+import { db } from './db.js'
 
 const Status = {
     None: 0,
     Build: 1
 }
 
-exports.Status = Status;
-
-exports.get = async (name, uid) => {
+async function get(name, uid) {
     const project = await db.query('select * from projects where name=$1 and uid=$2;', [name, uid]);
     if (!project.rowCount)
         return null;
@@ -15,7 +13,7 @@ exports.get = async (name, uid) => {
         return project.rows[0];
 }
 
-exports.getById = async (pid) => {
+async function getById(pid) {
     const project = await db.query('select * from projects where id=$1;', [pid]);
     if (!project.rowCount)
         return null;
@@ -23,7 +21,7 @@ exports.getById = async (pid) => {
         return project.rows[0];
 }
 
-exports.getServer = async (name, uid) => {
+async function getServer(name, uid) {
     let rsl = await db.query(
         'select * from projects as P join servers as S on P.sid = S.id where P.name=$1 and P.uid=$2;',
         [name, uid]
@@ -48,11 +46,11 @@ exports.getServer = async (name, uid) => {
     return { project, server };
 }
 
-exports.getAll = async (uid) => {
+async function getAll(uid) {
     return await (await db.query('select * from projects where uid=$1;', [uid])).rows;
 }
 
-exports.create = async (project) => {
+async function create(project) {
     try {
         await db.execute('insert into projects (uid,name,config,sid) values ($1,$2,$3,$4);', [
             project.uid,
@@ -67,7 +65,7 @@ exports.create = async (project) => {
     }
 }
 
-exports.updateConfig = async (project) => {
+async function updateConfig(project) {
     const rsl = await db.query('update projects set config=$1 where name=$2 and uid=$3;', [
         project.config,
         project.name,
@@ -76,7 +74,7 @@ exports.updateConfig = async (project) => {
     return Boolean(rsl.rowCount);
 }
 
-exports.initBuild = async (project) => {
+async function initBuild(project) {
     const rsl = await db.query('update projects set status=$1 where name=$2 and uid=$3 and status=$4;', [
         Status.Build,
         project.name,
@@ -87,10 +85,12 @@ exports.initBuild = async (project) => {
     return Boolean(rsl.rowCount);
 }
 
-exports.endBuild = async (project) => {
+async function endBuild(project) {
     await db.execute('update projects set status=$1 where pid=$2;', [
         Status.None,
         project.id
     ]);
     project.status = Status.None;
 }
+
+export { endBuild, initBuild, updateConfig, get, getAll, getServer, getById, create, Status }

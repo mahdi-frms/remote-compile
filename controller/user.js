@@ -1,9 +1,9 @@
-const userdb = require('../model/user')
-const crypto = require('crypto')
-const jwt = require('jsonwebtoken')
-const express = require('express')
-const { body } = require('express-validator')
-const { validArgs, validAuth } = require('./util')
+import * as userdb from '../model/user.js'
+import * as crypto from 'crypto'
+import * as jwt from 'jsonwebtoken'
+import express from 'express'
+import { body } from 'express-validator'
+import { validArgs, validAuth } from './util.js'
 
 const passwordSalt = process.env.MD5_SALT;
 
@@ -125,4 +125,4 @@ userRoute.post('/charge',
     validArgs, validAuth, charge
 );
 
-exports.user = userRoute
+export { userRoute as user };
