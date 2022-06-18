@@ -51,3 +51,10 @@ exports.getProjectUser = async (id, uid) => {
 
     return { user, project, build };
 }
+
+exports.getTarget = async (id, tarname) => {
+    const rsl = await db.query('select objkey from targets where bid=$1 and name=$2;', [id, tarname]);
+    if (rsl.rowCount == 0)
+        return null;
+    return rsl.rows[0];
+}

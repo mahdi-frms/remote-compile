@@ -18,7 +18,7 @@ let buildRoute = express()
 
 async function getBuildStatus(req, res) {
     const authUser = req.user;
-    const { project, build, user } = await buildb.getProjectUser(req.params.build, authUser.id);
+    const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
     if (!build)
         return res.status(404).end('build not found');
     res.json({ buildId: build.id, status: build.status });
@@ -26,7 +26,7 @@ async function getBuildStatus(req, res) {
 
 async function getBuildLog(req, res) {
     const authUser = req.user;
-    const { project, build, user } = await buildb.getProjectUser(req.params.build, authUser.id);
+    const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
     if (!build)
         return res.status(404).end('build not found');
     if (build.status == buildb.Status.Compiling)
@@ -40,6 +40,27 @@ async function getBuildLog(req, res) {
     }
 }
 
+async function getBuildTarget(req, res) {
+    const authUser = req.user;
+    const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
+    if (!build)
+        return res.status(404).end('build not found');
+    if (build.status == buildb.Status.Compiling)
+        return res.status(400).end('build not complete');
+    const tarname = req.params.target;
+    const target = await buildb.getTarget(build.id, tarname);
+    if (!target)
+        return res.status(404).end(`target '${tarname}' not generated`);
+    const objkey = target.objkey;
+    try {
+        const content = await minioClient.getObject(minioTargetsBucket, objkey);
+        content.pipe(res);
+    }
+    catch (err) {
+        res.status(500).end('failed to retrieve target');
+    }
+}
+
 buildRoute.get('/build/:build/status',
     param('build').isInt().toInt(),
     validArgs, validAuth, getBuildStatus
@@ -48,6 +69,11 @@ buildRoute.get('/build/:build/status',
 buildRoute.get('/build/:build/log',
     param('build').isInt().toInt(),
     validArgs, validAuth, getBuildLog
+)
+
+buildRoute.get('/build/:build/target/:target',
+    param('build').isInt().toInt(),
+    validArgs, validAuth, getBuildTarget
 )
 
 exports.build = buildRoute
