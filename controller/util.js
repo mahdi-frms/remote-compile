@@ -22,3 +22,12 @@ exports.validAuth = async (req, res, next) => {
         next()
     })
 }
+
+exports.validSecret = async (req, res, next) => {
+    const token = req.cookies['rcs-secret']
+    if (!token)
+        return res.status(400).end('this API call requires special privileges');
+    if (token != process.env.RCS_SECRET)
+        return res.status(401).end('authentication failed : invalid rcs secret');
+    next()
+}

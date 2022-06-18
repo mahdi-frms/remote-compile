@@ -15,6 +15,14 @@ exports.get = async (name, uid) => {
         return project.rows[0];
 }
 
+exports.getById = async (pid) => {
+    const project = await db.query('select * from projects where id=$1;', [pid]);
+    if (!project.rowCount)
+        return null;
+    else
+        return project.rows[0];
+}
+
 exports.getServer = async (name, uid) => {
     let rsl = await db.query(
         'select * from projects as P join servers as S on P.sid = S.id where P.name=$1 and P.uid=$2;',
@@ -77,4 +85,12 @@ exports.initBuild = async (project) => {
     ]);
     project.status = Status.Build;
     return Boolean(rsl.rowCount);
+}
+
+exports.endBuild = async (project) => {
+    await db.execute('update projects set status=$1 where pid=$2;', [
+        Status.None,
+        project.id
+    ]);
+    project.status = Status.None;
 }

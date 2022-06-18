@@ -4,7 +4,7 @@ const srvdb = require('../model/server')
 const buildb = require('../model/build')
 const filedb = require('../model/file')
 const { param } = require('express-validator')
-const { validArgs, validAuth } = require('./util')
+const { validArgs, validAuth, validSecret } = require('./util')
 const pconf = require('./pconf');
 const minio = require('minio');
 
@@ -119,6 +119,14 @@ async function postProjectBuild(req, res) {
     res.json({ buildId })
 }
 
+async function postProjectNotify(req, res) {
+    const project = await projdb.getById(req.params.pid)
+    if (!project)
+        return res.status(404).end('project not found');
+    await projdb.endBuild(project)
+    res.end()
+}
+
 projRoute.get('/project/:project',
     param('project').isLength({ max: 50 }),
     validAuth, getProject
@@ -155,6 +163,11 @@ projRoute.get('/project/:project/file/:file',
 projRoute.post('/project/:project/build',
     param('project').isLength({ max: 50 }),
     validAuth, postProjectBuild
+)
+
+projRoute.post('/project/:pid/notify',
+    param('pid').isInt().toInt(),
+    validSecret, postProjectNotify
 )
 
 exports.project = projRoute
