@@ -15,6 +15,31 @@ exports.get = async (name, uid) => {
         return project.rows[0];
 }
 
+exports.getServer = async (name, uid) => {
+    let rsl = await db.query(
+        'select * from projects as P join servers as S on P.sid = S.id where P.name=$1 and P.uid=$2;',
+        [name, uid]
+    );
+    if (!rsl.rowCount)
+        return { project: null, server: null };
+    rsl = rsl.rows[0];
+    const project = {
+        id: rsl.id,
+        name: rsl.name,
+        uid: rsl.uid,
+        sid: rsl.sid,
+        config: rsl.config,
+        status: rsl.id,
+    };
+    const server = {
+        id: rsl.sid,
+        endpoint: rsl.endpoint,
+        port: rsl.port,
+        projects: rsl.projects
+    };
+    return { project, server };
+}
+
 exports.getAll = async (uid) => {
     return await (await db.query('select * from projects where uid=$1;', [uid])).rows;
 }
