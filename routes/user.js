@@ -1,42 +1,33 @@
 import express from 'express'
-import { body } from 'express-validator'
 import { charge, chpass, chname, login, register, profile } from '../controller/user.js'
-import { validArgs, validAuth } from '../controller/util.js'
+import { validArgs, validAuth, validBodyString, validBodyStringOptional, validBodyPositiveInteger } from './valid.js'
 
 let route = express()
 route.use(express.json())
 
-function validateString(str) {
-    return body(str).isString().isLength({ max: 50 })
-}
-
-function validateStringOptional(str) {
-    return body(str).if(body(str).exists()).isString().isLength({ max: 50 })
-}
-
 route.post('/login',
-    validateString('username'),
-    validateString('password'),
+    validBodyString('username'),
+    validBodyString('password'),
     validArgs, login
 );
 
 route.post('/chname',
-    validateStringOptional('username'),
-    validateStringOptional('password'),
+    validBodyStringOptional('username'),
+    validBodyStringOptional('password'),
     validArgs, validAuth, chname
 );
 
 route.post('/register',
-    validateString('username'),
-    validateString('password'),
-    validateString('fname'),
-    validateString('lname'),
+    validBodyString('username'),
+    validBodyString('password'),
+    validBodyString('fname'),
+    validBodyString('lname'),
     validArgs, register
 );
 
 route.post('/chpass',
-    validateString('newpass'),
-    validateString('oldpass'),
+    validBodyString('newpass'),
+    validBodyString('oldpass'),
     validArgs, validAuth, chpass
 );
 
@@ -45,7 +36,7 @@ route.get('/profile',
 );
 
 route.post('/charge',
-    body('credit').isInt().toInt(),
+    validBodyPositiveInteger('credit'),
     validArgs, validAuth, charge
 );
 

@@ -55,8 +55,6 @@ async function profile(req, res) {
 async function charge(req, res) {
     let { user } = req;
     const extraCredit = req.body.credit;
-    if (extraCredit < 0)
-        return res.status(400).end('credit must be a positive integer')
     const credit = user.credit + extraCredit;
     await userdb.updateCredit(user, credit)
     res.json({ credit: user.credit })

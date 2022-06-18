@@ -1,26 +1,21 @@
 import express from 'express'
-import { param } from 'express-validator'
 import { getBuildLog, getBuildStatus, getBuildTarget } from '../controller/build.js'
-import { validArgs, validAuth } from '../controller/util.js'
+import { validArgs, validAuth, validParamId } from './valid.js'
 
 let route = express()
 
-function validateBuild() {
-    return param('build').isInt().toInt()
-}
-
 route.get('/build/:build/status',
-    validateBuild(), validArgs,
+    validParamId('build'), validArgs,
     validAuth, getBuildStatus
 )
 
 route.get('/build/:build/log',
-    validateBuild(), validArgs,
+    validParamId('build'), validArgs,
     validAuth, getBuildLog
 )
 
 route.get('/build/:build/target/:target',
-    validateBuild(), validArgs,
+    validParamId('build'), validArgs,
     validAuth, getBuildTarget
 )
 

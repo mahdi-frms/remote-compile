@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken'
 import * as userdb from '../model/user.js'
-import { validationResult } from 'express-validator'
+import { validationResult, param, body } from 'express-validator'
 
 async function validArgs(req, res, next) {
     const errors = validationResult(req);
@@ -32,4 +32,33 @@ async function validSecret(req, res, next) {
     next()
 }
 
-export { validArgs, validSecret, validAuth }
+function validParamString(str) {
+    return param(str).isLength({ max: 50 });
+}
+
+function validBodyString(str) {
+    return body(str).isString().isLength({ max: 50 })
+}
+
+function validBodyStringOptional(str) {
+    return body(str).if(body(str).exists()).isString().isLength({ max: 50 })
+}
+
+function validParamId(id) {
+    return param(id).isInt().toInt()
+}
+
+function validBodyPositiveInteger(num) {
+    return param(num).isInt({ min: 1 }).toInt()
+}
+
+export {
+    validArgs,
+    validSecret,
+    validAuth,
+    validParamString,
+    validParamId,
+    validBodyString,
+    validBodyStringOptional,
+    validBodyPositiveInteger
+}
