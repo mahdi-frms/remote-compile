@@ -9,6 +9,6 @@ const Status = {
 exports.Status = Status;
 
 exports.create = async (build) => {
-    const rsl = await db.query('insert into builds (pid) values ($1);', [build.pid]);
+    const rsl = await db.query('insert into builds (pid) values ($1) returning id;', [build.pid]);
     return rsl.rows[0].id
 }

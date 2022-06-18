@@ -1,6 +1,7 @@
 const express = require('express')
 const projdb = require('../model/project')
 const srvdb = require('../model/server')
+const buildb = require('../model/build')
 const { param } = require('express-validator')
 const { validArgs, validAuth } = require('./util')
 const pconf = require('./pconf');
@@ -98,6 +99,19 @@ async function getProjectFile(req, res) {
     }
 }
 
+async function postProjectBuild(req, res) {
+    let { project } = req.params
+    const { user } = req;
+    project = await projdb.get(project, user.id);
+    if (!project)
+        return res.status(404).end('project not found');
+    if (!await projdb.initBuild(project))
+        return res.status(400).end('project is being built');
+    buildId = await buildb.create({ pid: project.id })
+    // requestBuild(project.sid,buildId)
+    res.json({ buildId })
+}
+
 projRoute.get('/project/:project',
     validAuth, getProject
 )
@@ -123,6 +137,10 @@ projRoute.put('/project/:project/file/:file',
 projRoute.get('/project/:project/file/:file',
     param('file').isInt().toInt(),
     validArgs, validAuth, getProjectFile
+)
+
+projRoute.post('/project/:project/build',
+    validAuth, postProjectBuild
 )
 
 exports.project = projRoute
