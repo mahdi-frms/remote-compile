@@ -1,9 +1,6 @@
 import * as userdb from '../model/user.js'
 import * as crypto from 'crypto'
 import * as jwt from 'jsonwebtoken'
-import express from 'express'
-import { body } from 'express-validator'
-import { validArgs, validAuth } from './util.js'
 
 const passwordSalt = process.env.MD5_SALT;
 
@@ -87,42 +84,4 @@ async function chname(req, res) {
     res.end()
 }
 
-let userRoute = express()
-userRoute.use(express.json())
-
-userRoute.post('/login',
-    body('username').isString().isLength({ max: 50 }),
-    body('password').isString().isLength({ max: 50 }),
-    validArgs, login
-);
-
-userRoute.post('/chname',
-    body('fname').if(body('fname').exists()).isString().isLength({ max: 50 }),
-    body('lname').if(body('lname').exists()).isString().isLength({ max: 50 }),
-    validArgs, validAuth, chname
-);
-
-userRoute.post('/register',
-    body('username').isString().isLength({ max: 50 }),
-    body('password').isString().isLength({ max: 50 }),
-    body('fname').isString().isLength({ max: 50 }),
-    body('lname').isString().isLength({ max: 50 }),
-    validArgs, register
-);
-
-userRoute.post('/chpass',
-    body('newpass').isString().isLength({ max: 50 }),
-    body('oldpass').isString().isLength({ max: 50 }),
-    validArgs, validAuth, chpass
-);
-
-userRoute.get('/profile',
-    validAuth, profile
-);
-
-userRoute.post('/charge',
-    body('credit').isInt(),
-    validArgs, validAuth, charge
-);
-
-export { userRoute as user };
+export { login, register, charge, chpass, chname, profile };

@@ -2,7 +2,7 @@ import { } from 'dotenv/config'
 
 import cookieParser from 'cookie-parser'
 import express from 'express'
-import { user } from './controller/user.js'
+import { user } from './routes/user.js'
 import { project } from './controller/project.js'
 import { build } from './controller/build.js'
 
