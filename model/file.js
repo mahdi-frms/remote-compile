@@ -17,4 +17,9 @@ async function update(pid, fid) {
     return rsl.rows[0].objkey
 }
 
-export { create, update }
+async function getAll(pid) {
+    const rsl = await db.query('select fid,version from files where pid=$1', [pid]);
+    return rsl.rows
+}
+
+export { create, update, getAll }

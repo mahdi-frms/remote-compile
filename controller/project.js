@@ -124,6 +124,16 @@ async function getProjectFile(req, res) {
     }
 }
 
+async function getProjectFiles(req, res) {
+    let { project } = req.params
+    const { user } = req;
+    project = await projdb.get(project, user.id);
+    if (!project)
+        return res.status(404).end('project not found');
+
+    res.json(await filedb.getAll(project.id))
+}
+
 async function postProjectBuild(req, res) {
     const projname = req.params.project
     const { user } = req;
@@ -150,7 +160,7 @@ async function postProjectNotify(req, res) {
 export {
     getProject, postProject, putProject,
     getProjects,
-    getProjectFile, putProjectFile, postProjectFile,
+    getProjectFile, putProjectFile, postProjectFile, getProjectFiles,
     postProjectBuild,
     postProjectNotify,
 }
