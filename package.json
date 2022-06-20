@@ -7,7 +7,7 @@
     "start": "node app.js"
   },
   "keywords": [],
-  "author": "mahdif <mahdif1380@outlook.com>",
+  "author": "mahdif <faramarzpour98@gmail.com>",
   "license": "MIT",
   "type": "module",
   "dependencies": {
