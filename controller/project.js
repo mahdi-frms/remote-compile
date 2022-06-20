@@ -1,8 +1,28 @@
+import * as userdb from '../model/user.js'
 import * as projdb from '../model/project.js'
 import * as buildb from '../model/build.js'
+import * as filedb from '../model/file.js'
 import * as srvdb from '../model/server.js'
 import * as pconf from './pconf.js'
 import { got } from 'got';
+
+const COST_PER_BUILD = (() => {
+    let cost = Number(process.env.COST_PER_BUILD)
+    if (!cost || cost % 1 !== 0 || cost <= 0) {
+        console.error(`invalid COST_PER_BUILD (${process.env.COST_PER_BUILD})`)
+        process.exit(1)
+    }
+    return cost
+}).call()
+
+function checkFiles(ufiles, nfiles) {
+    let unavailables = []
+    for (const nf of nfiles) {
+        if (ufiles.findIndex((uf) => uf.fid == nf) == -1)
+            unavailables.push(nf)
+    }
+    return unavailables.length == 0
+}
 
 async function requestBuild(server, buildId) {
     const URL = `${server.endPoint}:${server.port}/build/${buildId}`
@@ -61,18 +81,28 @@ async function putProject(req, res) {
 }
 
 async function postProjectBuild(req, res) {
-    const projname = req.params.project
+    const projname = req.params.project;
     const { user } = req;
     const { project, server } = await projdb.getServer(projname, user.id);
     if (!project)
         return res.status(404).end('project not found');
+    const uploadedFiles = await filedb.getAll(project.id);
+    const neededFiles = pconf.getTreeFiles(project.config.tree);
+    if (!checkFiles(uploadedFiles, neededFiles))
+        return res.status(400).end(`all files need to be uploaded before build`);
+    if (user.credit < COST_PER_BUILD)
+        return res.status(400).end(`not enough credit (${user.credit}) for build`);
     if (!await projdb.initBuild(project))
         return res.status(400).end('project is being built');
-    buildId = await buildb.create({ pid: project.id })
-    const buildReuqestResult = await requestBuild(server, buildId)
-    if (!buildReuqestResult)
-        return res.status(400).end('all source files must be uploaded before build');
-    res.json({ buildId })
+    const buildId = await buildb.create({ pid: project.id });
+    await userdb.updateCredit(user, user.credit - COST_PER_BUILD);
+    try {
+        await requestBuild(server, buildId);
+    }
+    catch (err) {
+        return res.status(500).end('operation failed')
+    }
+    res.json({ buildId });
 }
 
 async function postProjectNotify(req, res) {
