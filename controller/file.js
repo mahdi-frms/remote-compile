@@ -35,7 +35,7 @@ async function putProjectFile(req, res) {
         return res.status(400).end('file not in project tree');
     const filekey = await filedb.update(project.id, file);
     if (!filekey)
-        return res.status(400).end('file not created yet');
+        return res.status(404).end('file not found');
     await minioClient.putObject(minioFilesBucket, filekey, req.body)
     res.end()
 }
