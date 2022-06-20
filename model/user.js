@@ -1,4 +1,4 @@
-import * as db from './db.js'
+import db from './db.js'
 
 async function get(username) {
     const user = await db.query('select * from users where username=($1);', [username]);

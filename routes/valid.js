@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import * as userdb from '../model/user.js'
 import { validationResult, param, body } from 'express-validator'
 

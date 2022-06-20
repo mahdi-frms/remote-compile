@@ -1,4 +1,4 @@
-import { db } from './db.js'
+import db from './db.js'
 
 async function getMin() {
     const project = await db.query('select * from servers order by projects asc limit 1;');

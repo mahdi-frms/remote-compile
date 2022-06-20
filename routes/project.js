@@ -2,7 +2,7 @@ import express from 'express'
 import {
     postProject, putProject, getProject,
     getProjects,
-    getProjectFile, putProjectFile,
+    getProjectFile, putProjectFile, postProjectFile,
     postProjectNotify,
     postProjectBuild
 } from '../controller/project.js'
@@ -34,6 +34,13 @@ route.put('/project/:project/file/:file',
     validParamString('project'),
     validParamId('file'),
     validArgs, validAuth, putProjectFile
+)
+
+route.post('/project/:project/file/:file',
+    express.text(),
+    validParamString('project'),
+    validParamId('file'),
+    validArgs, validAuth, postProjectFile
 )
 
 route.get('/project/:project/file/:file',

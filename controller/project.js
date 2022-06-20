@@ -91,6 +91,23 @@ async function putProjectFile(req, res) {
     res.end()
 }
 
+async function postProjectFile(req, res) {
+    let { project, file } = req.params
+    const { user } = req;
+    project = await projdb.get(project, user.id);
+    if (!project)
+        return res.status(404).end('project not found');
+    const files = pconf.getTreeFiles(project.config.tree)
+    if (!files.includes(file))
+        return res.status(400).end('file not in project tree');
+    const fileKey = getFileKey(project.id, file);
+    const rsl = await filedb.create(project.id, file, fileKey)
+    if (!rsl)
+        return res.status(400).end('file already exists')
+    await minioClient.putObject(minioFilesBucket, fileKey, req.body)
+    res.end()
+}
+
 async function getProjectFile(req, res) {
     let { project, file } = req.params
     const { user } = req;
@@ -132,7 +149,7 @@ async function postProjectNotify(req, res) {
 export {
     getProject, postProject, putProject,
     getProjects,
-    getProjectFile, putProjectFile,
+    getProjectFile, putProjectFile, postProjectFile,
     postProjectBuild,
     postProjectNotify,
 }
