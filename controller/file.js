@@ -17,12 +17,19 @@ function getFileKey(pid, fid) {
     return `${pid}-${fid}`
 }
 
-async function putProjectFile(req, res) {
-    let { project, file } = req.params
+async function projectFile(req, res, next) {
+    let { project } = req.params
     const { user } = req;
     project = await projdb.get(project, user.id);
     if (!project)
         return res.status(404).end('project not found');
+    req.project = project
+    next()
+}
+
+async function putProjectFile(req, res) {
+    const { project } = req
+    const { file } = req.params
     const files = pconf.getTreeFiles(project.config.tree)
     if (!files.includes(file))
         return res.status(400).end('file not in project tree');
@@ -34,11 +41,8 @@ async function putProjectFile(req, res) {
 }
 
 async function postProjectFile(req, res) {
-    let { project, file } = req.params
-    const { user } = req;
-    project = await projdb.get(project, user.id);
-    if (!project)
-        return res.status(404).end('project not found');
+    const { project } = req
+    const { file } = req.params
     const files = pconf.getTreeFiles(project.config.tree)
     if (!files.includes(file))
         return res.status(400).end('file not in project tree');
@@ -51,11 +55,8 @@ async function postProjectFile(req, res) {
 }
 
 async function getProjectFile(req, res) {
-    let { project, file } = req.params
-    const { user } = req;
-    project = await projdb.get(project, user.id);
-    if (!project)
-        return res.status(404).end('project not found');
+    const { project } = req
+    const { file } = req.params
     try {
         const content = await minioClient.getObject(minioFilesBucket, getFileKey(project.id, file))
         content.pipe(res)
@@ -66,15 +67,10 @@ async function getProjectFile(req, res) {
 }
 
 async function getProjectFiles(req, res) {
-    let { project } = req.params
-    const { user } = req;
-    project = await projdb.get(project, user.id);
-    if (!project)
-        return res.status(404).end('project not found');
-
+    const { project } = req
     res.json(await filedb.getAll(project.id))
 }
 
 export {
-    getProjectFile, putProjectFile, postProjectFile, getProjectFiles,
+    getProjectFile, putProjectFile, postProjectFile, getProjectFiles, projectFile,
 }
