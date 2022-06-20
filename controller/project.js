@@ -85,9 +85,10 @@ async function putProjectFile(req, res) {
     const files = pconf.getTreeFiles(project.config.tree)
     if (!files.includes(file))
         return res.status(400).end('file not in project tree');
-    const fileKey = getFileKey(project.id, file);
-    await filedb.create(project.id, file, fileKey)
-    await minioClient.putObject(minioFilesBucket, fileKey, req.body)
+    const filekey = await filedb.update(project.id, file);
+    if (!filekey)
+        return res.status(400).end('file not created yet');
+    await minioClient.putObject(minioFilesBucket, filekey, req.body)
     res.end()
 }
 
