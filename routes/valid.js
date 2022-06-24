@@ -49,7 +49,7 @@ function validParamId(id) {
 }
 
 function validBodyPositiveInteger(num) {
-    return param(num).isInt({ min: 1 }).toInt()
+    return body(num).isInt({ min: 1 }).toInt()
 }
 
 export {
