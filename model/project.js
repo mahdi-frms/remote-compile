@@ -66,7 +66,7 @@ async function create(project) {
 }
 
 async function updateConfig(project) {
-    const rsl = await db.query('update projects set config=$1 where name=$2 and uid=$3;', [
+    const rsl = await db.query('update projects set config=$1, version=version+1 where name=$2 and uid=$3;', [
         project.config,
         project.name,
         project.uid
