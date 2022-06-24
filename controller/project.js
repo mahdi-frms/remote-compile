@@ -25,7 +25,7 @@ function checkFiles(ufiles, nfiles) {
 }
 
 async function requestBuild(server, buildId) {
-    const URL = `${server.endPoint}:${server.port}/build/${buildId}`
+    const URL = `${server.endPoint}:${server.port}/api/build/${buildId}`
     const res = await got.post(URL);
     if (res.statusCode != 200)
         return false;
