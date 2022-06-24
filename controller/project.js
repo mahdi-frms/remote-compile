@@ -110,6 +110,12 @@ async function postProjectNotify(req, res) {
     if (!project)
         return res.status(404).end('project not found');
     await projdb.endBuild(project)
+    /**
+     * here can be some means of the server
+     * providing the client with realtime
+     * notification (such as notification
+     * services, sockets, ...)
+     */
     res.end()
 }
 
