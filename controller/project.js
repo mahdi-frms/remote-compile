@@ -26,7 +26,7 @@ function checkFiles(ufiles, nfiles) {
 
 async function requestBuild(server, buildId) {
     const URL = `${server.endPoint}:${server.port}/api/build/${buildId}`
-    const res = await got.post(URL);
+    const res = await got.post(URL, { json: { rcs: process.env.RCS_SECRET } });
     if (res.statusCode != 200)
         return false;
     return true;
