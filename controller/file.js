@@ -1,17 +1,9 @@
 import * as projdb from '../model/project.js'
 import * as filedb from '../model/file.js'
-import * as minio from 'minio'
 import * as pconf from './pconf.js'
+import storage from './storage.js'
 
 const minioFilesBucket = 'projsrc'
-
-let minioClient = new minio.Client({
-    port: Number(process.env.MINIO_PORT),
-    endPoint: process.env.MINIO_ENDPOINT,
-    accessKey: process.env.MINIO_ACCESSKEY,
-    secretKey: process.env.MINIO_SECRETKEY,
-    useSSL: false
-})
 
 function getFileKey(pid, fid) {
     return `${pid}-${fid}`
@@ -36,7 +28,7 @@ async function putProjectFile(req, res) {
     const filekey = await filedb.update(project.id, file);
     if (!filekey)
         return res.status(404).end('file not found');
-    await minioClient.putObject(minioFilesBucket, filekey, req.body)
+    await storage.putObject(minioFilesBucket, filekey, req.body)
     res.end()
 }
 
@@ -50,7 +42,7 @@ async function postProjectFile(req, res) {
     const rsl = await filedb.create(project.id, file, fileKey)
     if (!rsl)
         return res.status(400).end('file already exists')
-    await minioClient.putObject(minioFilesBucket, fileKey, req.body)
+    await storage.putObject(minioFilesBucket, fileKey, req.body)
     res.end()
 }
 
@@ -58,7 +50,7 @@ async function getProjectFile(req, res) {
     const { project } = req
     const { file } = req.params
     try {
-        const content = await minioClient.getObject(minioFilesBucket, getFileKey(project.id, file))
+        const content = await storage.getObject(minioFilesBucket, getFileKey(project.id, file))
         content.pipe(res)
     }
     catch (err) {

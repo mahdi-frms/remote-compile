@@ -1,15 +1,7 @@
 import * as buildb from '../model/build.js'
-import * as minio from 'minio'
+import storage from './storage.js'
 
 const minioTargetsBucket = 'buildtar'
-
-let minioClient = new minio.Client({
-    port: Number(process.env.MINIO_PORT),
-    endPoint: process.env.MINIO_ENDPOINT,
-    accessKey: process.env.MINIO_ACCESSKEY,
-    secretKey: process.env.MINIO_SECRETKEY,
-    useSSL: false
-})
 
 async function getBuildStatus(req, res) {
     const authUser = req.user;
@@ -27,7 +19,7 @@ async function getBuildLog(req, res) {
     if (build.status == buildb.Status.Compiling)
         return res.status(400).end('build not complete');
     try {
-        const content = await minioClient.getObject(minioTargetsBucket, build.logkey);
+        const content = await storage.getObject(minioTargetsBucket, build.logkey);
         content.pipe(res);
     }
     catch (err) {
@@ -48,7 +40,7 @@ async function getBuildTarget(req, res) {
         return res.status(404).end(`target '${tarname}' not generated`);
     const objkey = target.objkey;
     try {
-        const content = await minioClient.getObject(minioTargetsBucket, objkey);
+        const content = await storage.getObject(minioTargetsBucket, objkey);
         content.pipe(res);
     }
     catch (err) {
