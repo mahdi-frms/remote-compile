@@ -104,6 +104,15 @@ function validate(config) {
     for (const target in config.targets) {
         if (!validateTarget(config.targets[target]))
             return false;
+        if (config.targets[target].dependency) {
+            if (config.targets[target].output == 'ar')
+                return false;
+            for (const d of config.targets[target].dependency) {
+                if (config.targets[d] && config.targets[d].output == 'bin') {
+                    return false;
+                }
+            }
+        }
         for (const file of config.targets[target].src)
             if (!treeFiles.includes(file))
                 return false;
