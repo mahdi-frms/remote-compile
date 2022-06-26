@@ -1,7 +1,6 @@
 import * as userdb from '../model/user.js'
 import * as projdb from '../model/project.js'
 import * as buildb from '../model/build.js'
-import * as filedb from '../model/file.js'
 import * as srvdb from '../model/server.js'
 import * as pconf from './pconf.js'
 import { got } from 'got';
