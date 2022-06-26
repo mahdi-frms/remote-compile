@@ -1,11 +1,5 @@
 import db from './db.js'
 
-const Status = {
-    Compiling: 0,
-    Success: 1,
-    Failure: 2
-}
-
 async function create(build) {
     const rsl = await db.query('insert into builds (pid) values ($1) returning id;', [build.pid]);
     return rsl.rows[0].id
@@ -45,6 +39,7 @@ async function getProjectUser(id, uid) {
         id: rsl.bid,
         pid: rsl.pid,
         status: rsl.bstatus,
+        logkey: rsl.logkey
     };
 
     return { user, project, build };
@@ -57,4 +52,4 @@ async function getTarget(id, tarname) {
     return rsl.rows[0];
 }
 
-export { create, getProjectUser, getTarget, Status }
+export { create, getProjectUser, getTarget }

@@ -86,7 +86,7 @@ async function initBuild(project) {
 }
 
 async function endBuild(project) {
-    await db.execute('update projects set status=$1 where pid=$2;', [
+    await db.execute('update projects set status=$1 where id=$2;', [
         Status.None,
         project.id
     ]);

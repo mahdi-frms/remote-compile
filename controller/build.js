@@ -8,7 +8,7 @@ async function getBuildStatus(req, res) {
     const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
     if (!build)
         return res.status(404).end('build not found');
-    res.json({ buildId: build.id, status: build.status });
+    res.json(build.status || {});
 }
 
 async function getBuildLog(req, res) {
@@ -16,7 +16,7 @@ async function getBuildLog(req, res) {
     const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
     if (!build)
         return res.status(404).end('build not found');
-    if (build.status == buildb.Status.Compiling)
+    if (build.status == null)
         return res.status(400).end('build not complete');
     try {
         const content = await storage.getObject(minioTargetsBucket, build.logkey);
@@ -32,7 +32,7 @@ async function getBuildTarget(req, res) {
     const { build } = await buildb.getProjectUser(req.params.build, authUser.id);
     if (!build)
         return res.status(404).end('build not found');
-    if (build.status == buildb.Status.Compiling)
+    if (build.status == null)
         return res.status(400).end('build not complete');
     const tarname = req.params.target;
     const target = await buildb.getTarget(build.id, tarname);

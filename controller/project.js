@@ -15,15 +15,6 @@ const COST_PER_BUILD = (() => {
     return cost
 }).call()
 
-function checkFiles(ufiles, nfiles) {
-    let unavailables = []
-    for (const nf of nfiles) {
-        if (ufiles.findIndex((uf) => uf.fid == nf) == -1)
-            unavailables.push(nf)
-    }
-    return unavailables.length == 0
-}
-
 async function requestBuild(server, buildId) {
     const URL = `http://${server.endpoint}:${server.port}/api/build/${buildId}`
     const res = await got.post(URL, { json: { rcs: process.env.RCS_SECRET } });
@@ -86,22 +77,20 @@ async function postProjectBuild(req, res) {
     const { project, server } = await projdb.getServer(projname, user.id);
     if (!project)
         return res.status(404).end('project not found');
-    const uploadedFiles = await filedb.getAll(project.id);
-    const neededFiles = pconf.getTreeFiles(project.config.tree);
-    if (!checkFiles(uploadedFiles, neededFiles))
-        return res.status(400).end(`all files need to be uploaded before build`);
     if (user.credit < COST_PER_BUILD)
         return res.status(400).end(`not enough credit (${user.credit}) for build`);
     if (!await projdb.initBuild(project))
         return res.status(400).end('project is being built');
     const buildId = await buildb.create({ pid: project.id });
-    await userdb.updateCredit(user, user.credit - COST_PER_BUILD);
     try {
         await requestBuild(server, buildId);
     }
     catch (err) {
-        return res.status(500).end('operation failed')
+        await projdb.endBuild(project);
+        return res.status(500).end('operation failed');
     }
+    await userdb.updateCredit(user, user.credit - COST_PER_BUILD);
+
     res.json({ buildId });
 }
 
