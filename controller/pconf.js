@@ -6,7 +6,7 @@ function validateTree(tree) {
             if (!validateTree(tree[entry]))
                 return false;
         }
-        else if (!tree[entry] instanceof Number)
+        else if (isNaN(tree[entry]))
             return false;
     }
     return true;
@@ -48,7 +48,7 @@ function validateIncludeList(list) {
 
 function validateSrc(list) {
     for (const src of list) {
-        if (!src instanceof Number)
+        if (isNaN(src))
             return false;
     }
     return true;
