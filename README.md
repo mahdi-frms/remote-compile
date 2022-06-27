@@ -4,7 +4,7 @@ This project is a Web service for a remote build service which accepts user's so
 
 ## Requirements
 
-The server relies on a seperated compile server for the actual build process. Minio object storage ( which is used for storing source files and built targets ) and PostgreSQL server instances must be running for the secver to function properly. a `.env` file is also needed for the following configurations:
+The server relies on a seperated [compile server](https://github.com/mahdi-frms/compile-server) for the actual build process. Minio object storage ( which is used for storing source files and built targets ) and PostgreSQL server instances must be running for the secver to function properly. a `.env` file is also needed for the following configurations:
 
 ```
 VERSION=                                # server version
